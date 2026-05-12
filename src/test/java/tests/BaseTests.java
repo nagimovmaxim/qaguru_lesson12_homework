@@ -17,21 +17,23 @@ public class BaseTests {
 
     @BeforeEach
     void addListener() {
-        SelenideLogger.addListener("AllureSelenide", new AllureSelenide());
+        SelenideLogger.addListener("AllureSelenide",
+                new AllureSelenide()
+                        .screenshots(true)
+                        .savePageSource(true)
+        );
     }
 
     @BeforeAll
     static void setup() {
-        String browser = System.getProperty("browser", "chrome");
-        String baseUrl = System.getProperty("baseUrl", "https://github.com");
-        String remote = System.getProperty("remote", "https://user1:1234@selenoid.autotests.cloud/wd/hub");
-
-        Configuration.browser = browser;
+        Configuration.browser = System.getProperty("browser", "chrome");
         Configuration.timeout = 10000;
-        Configuration.browserSize = "1920x1080";
+        Configuration.browserSize = System.getProperty("browserSize","1920x1080");
+        Configuration.browserVersion = System.getProperty("browserVersion","128.0");
+        Configuration.headless = Boolean.parseBoolean(System.getProperty("headless","true"));
         Configuration.savePageSource = true;
         Configuration.screenshots = true;
-        Configuration.baseUrl = baseUrl;
+        Configuration.baseUrl = System.getProperty("baseUrl", "https://github.com");
 
         DesiredCapabilities capabilities = new DesiredCapabilities();
         capabilities.setCapability("selenoid:options", Map.<String, Object>of(
@@ -39,7 +41,7 @@ public class BaseTests {
                 "enableVideo", true
         ));
         Configuration.browserCapabilities = capabilities;
-        Configuration.remote = remote;
+        Configuration.remote = System.getProperty("remote", "https://user1:1234@selenoid.autotests.cloud/wd/hub");
 
 
         if (System.getProperty("os.name").toLowerCase().contains("linux")) {
@@ -56,12 +58,6 @@ public class BaseTests {
                 }
             }
         }
-
-        SelenideLogger.addListener("AllureSelenide",
-                new AllureSelenide()
-                        .screenshots(true)
-                        .savePageSource(true)
-        );
     }
 
 
